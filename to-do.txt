@@ -1,0 +1,6 @@
+List tables 
+list items in tables
+create a table
+uplaod an item to table
+delete item in table
+delete the table
