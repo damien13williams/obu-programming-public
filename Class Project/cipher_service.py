@@ -1,31 +1,28 @@
-# This is the cipher service that take an encrypted message from json file and output the
-# decrypted message to the console using the Caesar cipher decryption method and flask for the web service
 # from flask import Flask, request, jsonify
 import json
 import boto3
 import time
+from english_words import get_english_words_set
+from nltk.corpus import words
 
 # app = Flask(__name__)
 
-# DynamoDB tables
-dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # change region if needed
+# DynamoDB table
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1') 
 puzzle_table = dynamodb.Table('CIS3823Spring26Project001')
 
 
-# Basic English words list for validation all caps
-ENGLISH_WORDS = set([
-    "THE", "BE", "TO", "OF", "AND", "A", "IN", "THAT", "HAVE", "I", "IT", "FOR", "NOT",
-    "ON", "WITH", "HE", "AS", "YOU", "DO", "AT", "HELLO", "WORLD", "THIS", "IS", "A", "TEST"
-])
+# Use a set for fast lookup and uppercase for compatibility with your code
+ENGLISH_WORDS = set(word.upper() for word in words.words())
 
 # Ceasar cipher decryption function for all caps
 def caesar_decrypt(text, shift):
     decrypted = []
     for char in text:
-        if char.isupper():  # uppercase letters
-            decrypted.append(chr((ord(char) - shift - 65) % 26 + 65))
-        elif char.islower():  # lowercase letters
-            decrypted.append(chr((ord(char) - shift - 97) % 26 + 97))
+        if char.isupper():
+            decrypted.append(chr((ord(char) - ord('A') - shift) % 26 + ord('A')))
+        elif char.islower():
+            decrypted.append(chr((ord(char) - ord('a') - shift) % 26 + ord('a')))
         else:
             decrypted.append(char)
     return ''.join(decrypted)
@@ -69,8 +66,8 @@ def decrypt_message():
     })
 '''
 # Process puzzle from DynamoDB
-# ----------------------
 def process_puzzle(puzzle_id="cipher_001", game_id="game_12345"):
+    start_time = time.time()
     # Get item from DynamoDB
     response = puzzle_table.get_item(Key={
             'puzzle_id': puzzle_id,
@@ -78,7 +75,6 @@ def process_puzzle(puzzle_id="cipher_001", game_id="game_12345"):
         })
     puzzle = response.get('Item')
 
-    start_time = time.time()
     encrypted_message = puzzle['encrypted_text']
 
     decrypted_text, shift_used = solve_cipher(encrypted_message)
