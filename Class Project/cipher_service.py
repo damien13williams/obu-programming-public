@@ -1,5 +1,5 @@
 # from flask import Flask, request, jsonify
-# import json
+import json
 import boto3
 import time
 # from english_words import english_words_set # Did not work so will save here for now. 
@@ -7,9 +7,16 @@ from nltk.corpus import words # Make sure to run nltk.download('words') before u
 
 # app = Flask(__name__)
 
-# DynamoDB table
-dynamodb = boto3.resource('dynamodb', region_name='us-east-1') 
-puzzle_table = dynamodb.Table('CIS3823Spring26Project001')
+# Load config
+with open('config.json') as f:
+    config = json.load(f)
+
+aws_region = config["aws_region"]
+table_name = config["dynamodb_table_name"]
+
+# Connect to DynamoDB
+dynamodb = boto3.resource('dynamodb', region_name=aws_region)
+puzzle_table = dynamodb.Table(table_name)
 
 # Load English words for scoring
 ENGLISH_WORDS = set(word.upper() for word in words.words())
