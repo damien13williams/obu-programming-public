@@ -1,9 +1,9 @@
 # from flask import Flask, request, jsonify
-import json
+# import json
 import boto3
 import time
-from english_words import get_english_words_set
-from nltk.corpus import words
+# from english_words import english_words_set # Did not work so will save here for now. 
+from nltk.corpus import words # Make sure to run nltk.download('words') before using this code to download the word list (looked up using gemini for english words)
 
 # app = Flask(__name__)
 
@@ -11,11 +11,10 @@ from nltk.corpus import words
 dynamodb = boto3.resource('dynamodb', region_name='us-east-1') 
 puzzle_table = dynamodb.Table('CIS3823Spring26Project001')
 
-
-# Use a set for fast lookup and uppercase for compatibility with your code
+# Load English words for scoring
 ENGLISH_WORDS = set(word.upper() for word in words.words())
 
-# Ceasar cipher decryption function for all caps
+# Ceasar cipher decryption function for all characters (both uppercase and lowercase)
 def caesar_decrypt(text, shift):
     decrypted = []
     for char in text:
@@ -32,7 +31,7 @@ def score_text(text):
     words = text.upper().split()
     return sum(1 for word in words if word in ENGLISH_WORDS)
 
-# Solve the cipher by going through all shifts and scoring 
+# Solve the cipher by going through all shifts and scoring (highest score wins and best shift will be selected)
 def solve_cipher(encrypted_message):
     best_score = -1
     best_text = ""
@@ -44,31 +43,11 @@ def solve_cipher(encrypted_message):
             best_score = score
             best_text = decrypted_message
             best_shift = shift
-
-
     return best_text, best_shift
-'''
-@app.route('/decrypt', methods=['POST'])
-def decrypt_message():
-    data = request.get_json()
-    encrypted_message = data.get('encrypted_message', '')
-    if not encrypted_message:
-        return jsonify({"error": "No encrypted message provided"}), 400
-
-
-
-    decrypted_message, shift_used = solve_cipher(encrypted_message)
-    # Print to console for debugging
-    print(f"Encrypted: {encrypted_message} → Decrypted: {decrypted_message} (Shift: {shift_used})")
-    return jsonify({
-        "decrypted_message": decrypted_message,
-        "shift_used": shift_used
-    })
-'''
 # Process puzzle from DynamoDB
 def process_puzzle(puzzle_id="cipher_001", game_id="game_12345"):
     start_time = time.time()
-    # Get item from DynamoDB
+    # Get my item from DynamoDB
     response = puzzle_table.get_item(Key={
             'puzzle_id': puzzle_id,
             'game_id': game_id
@@ -78,7 +57,7 @@ def process_puzzle(puzzle_id="cipher_001", game_id="game_12345"):
     encrypted_message = puzzle['encrypted_text']
 
     decrypted_text, shift_used = solve_cipher(encrypted_message)
-    vault_code = "7294"  # Replace with real logic if needed
+    vault_code = "7294"  # Replace with real logic if needed (unsure)
 
     solution_item = {
         'puzzle_id': puzzle['puzzle_id'],
@@ -97,9 +76,30 @@ def process_puzzle(puzzle_id="cipher_001", game_id="game_12345"):
     puzzle_table.put_item(Item=solution_item)
     print(f"Solved {puzzle['puzzle_id']}: shift={shift_used}, decrypted={decrypted_text}")
 
+# FLASK OPTION in last class, not needed for the current project. 
+'''
+@app.route('/decrypt', methods=['POST'])
+def decrypt_message():
+    data = request.get_json()
+    encrypted_message = data.get('encrypted_message', '')
+    if not encrypted_message:
+        return jsonify({"error": "No encrypted message provided"}), 400
+
+
+
+    decrypted_message, shift_used = solve_cipher(encrypted_message)
+    # Print to console for debugging
+    print(f"Encrypted: {encrypted_message} → Decrypted: {decrypted_message} (Shift: {shift_used})")
+    return jsonify({
+        "decrypted_message": decrypted_message,
+        "shift_used": shift_used
+    })
+'''
 '''
 if __name__ == '__main__':
     process_puzzle("cipher_001", game_id="game_12345")
     app.run(debug=True)
 '''
+
+# start up the service and process the puzzle
 process_puzzle("cipher_001", game_id="game_12345")
