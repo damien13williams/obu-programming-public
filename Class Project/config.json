@@ -1,0 +1,4 @@
+{
+  "aws_region": "us-east-1",
+  "dynamodb_table_name": "CIS3823Spring26Project001"
+}
