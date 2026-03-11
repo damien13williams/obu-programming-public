@@ -1,0 +1,13 @@
+{
+  "aws": {
+    "region": "us-east-1",
+    "sqs_queue_url": "https://sqs.us-east-1.amazonaws.com/216990846240/damien_sqs_testing",
+    "dynamo_table": "PuzzleTableDW"
+  },
+  "worker": {
+    "max_sqs_messages": 5,
+    "sqs_wait_time": 10,
+    "visibility_timeout": 30,
+    "max_retries": 5
+  }
+}
