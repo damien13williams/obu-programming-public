@@ -71,7 +71,7 @@ class CipherWorker(BaseWorker):
         vault_code = "7294"  # placeholder logic
 
         # --- Write solution to solution table ---
-        solution_table = get_dynamodb_table("CipherSolutionTableDW", self.region)
+        solution_table = get_dynamodb_table(input_table_name, self.region)
         solution_item = {
             "item_id": item_id,
             "puzzle_id": task_item.get("puzzle_id", "N/A"),

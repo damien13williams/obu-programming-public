@@ -81,4 +81,26 @@ class BaseWorker:
         """
         Must be implemented by child workers.
         """
-        raise NotImplementedError("Child workers must implement process_message()")
+        raise NotImplementedError("Child workers must implement process_message()")\
+        
+if __name__ == "__main__":
+    import subprocess
+    import sys
+
+    WORKERS = ["cipher", "data", "worker3", "worker4", "worker5"]
+
+    processes = [
+        subprocess.Popen(["python", "-m", f"workers.{w}_worker"])
+        for w in WORKERS
+    ]
+
+    print("All workers running. Press Ctrl+C to stop.")
+
+    try:
+        for p in processes:
+            p.wait()
+    except KeyboardInterrupt:
+        print("\nShutting down all workers...")
+        for p in processes:
+            p.terminate()
+        sys.exit(0)
