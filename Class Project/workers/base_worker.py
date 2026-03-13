@@ -18,6 +18,7 @@ class BaseWorker:
         self.region = config["aws"]["region"]
         self.sqs_url = config["aws"]["sqs_queue_url"]
 
+
         # Worker config
         self.max_messages = config["worker"]["max_sqs_messages"]
         self.wait_time = config["worker"]["sqs_wait_time"]
@@ -27,7 +28,7 @@ class BaseWorker:
         # Create SQS client
         self.sqs_client = get_sqs_client(self.region)
 
-    # ---------------- MAIN WORK LOOP ----------------
+    # Polls SQS for incoming messages
 
     def poll_sqs(self):
         """
@@ -53,7 +54,7 @@ class BaseWorker:
                     max_retries=self.max_retries
                 )
 
-    # ---------------- MESSAGE HANDLER ----------------
+    # Handles the message for processing and deletes after
 
     def process_sqs_message(self, msg):
         """
@@ -75,7 +76,7 @@ class BaseWorker:
 
         print("[INFO] Message processed and deleted")
 
-    # ---------------- ABSTRACT METHOD ----------------
+    #
 
     def process_message(self, message):
         """
@@ -94,7 +95,7 @@ if __name__ == "__main__":
         for w in WORKERS
     ]
 
-    print("All workers running. Press Ctrl+C to stop.")
+    print("[INFO]All workers nowrunning. Press Ctrl+C to stop.")
 
     try:
         for p in processes:

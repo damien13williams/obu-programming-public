@@ -14,7 +14,7 @@ class CipherWorker(BaseWorker):
         # Load English words for scoring
         self.ENGLISH_WORDS = set(word.upper() for word in words.words())
 
-    # ---------------- Cipher Logic ----------------
+    # Cipher logic
     def caesar_decrypt(self, text, shift):
         decrypted = []
         for char in text:
@@ -42,13 +42,13 @@ class CipherWorker(BaseWorker):
                 best_shift = shift
         return best_text, best_shift
 
-    # ---------------- Worker Processing ----------------
+    #Worker Processing
     def process_message(self, message):
         """
         Processes a single SQS message.
         SQS message contains:
         {
-            "table_name": "CipherInputTableDW",
+            "table_name": "PuzzleTableDW",
             "item_id": "item_1"
         }
         """
@@ -56,7 +56,7 @@ class CipherWorker(BaseWorker):
         input_table_name = message["table_name"]
         item_id = message["item_id"]
 
-        # --- Pull puzzle data from input table ---
+        # Pull the puzzle data from table
         input_table = get_dynamodb_table(input_table_name, self.region)
         task_item = input_table.get_item(Key={"item_id": item_id}).get("Item")
 
@@ -66,11 +66,11 @@ class CipherWorker(BaseWorker):
 
         encrypted_message = task_item["encrypted_text"]
 
-        # --- Process puzzle ---
+        # Process puzzle
         decrypted_text, shift_used = self.solve_cipher(encrypted_message)
-        vault_code = "7294"  # placeholder logic
+        vault_code = "7294"  # placeholder (note sure what to do with this entirely)
 
-        # --- Write solution to solution table ---
+        # Write solution back to the table
         solution_table = get_dynamodb_table(input_table_name, self.region)
         solution_item = {
             "item_id": item_id,
@@ -90,32 +90,11 @@ class CipherWorker(BaseWorker):
         put_item(solution_table, solution_item)
         print(f"[INFO] Solved {item_id}: shift={shift_used}, decrypted={decrypted_text}")
 
-    def process_sqs_message(self, msg):
-        """
-        Wrapper to process the SQS message and delete after success.
-        """
-        body = json.loads(msg["Body"])
-        self.process_message(body)
-        delete_message(self.sqs_client, self.sqs_url, msg["ReceiptHandle"])
-
-    def poll_sqs(self):
-        """Continuously poll SQS using config values."""
-        print(f"[INFO] Polling SQS queue: {self.sqs_url}")
-        while True:
-            messages = receive_messages(
-                client=self.sqs_client,
-                queue_url=self.sqs_url,
-                max_messages=self.max_messages,
-                wait_time=self.wait_time,
-                visibility_timeout=self.visibility_timeout
-            )
-
-            for msg in messages:
-                retry_with_backoff(lambda: self.process_sqs_message(msg), max_retries=self.max_retries)
-
-
 if __name__ == "__main__":
-    # Load worker config dynamically
     config_file = Path(__file__).parent.parent / "config" / "cipher_worker.json"
     worker = CipherWorker(config_file)
-    worker.poll_sqs()
+    # worker.poll_sqs()
+    try:
+        worker.poll_sqs()
+    except KeyboardInterrupt:
+        print("\n[INFO] Cipher worker stopped.")
