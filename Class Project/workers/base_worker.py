@@ -62,12 +62,16 @@ class BaseWorker:
         """
         body = json.loads(msg["Body"])
 
+        message_type = body.get("type")
+
+        if not self.should_process(message_type):
+            print(f"[INFO] Skipping message of type: {message_type}")
+            return
+
         print(f"[INFO] Processing message: {body}")
 
-        # Call the specific worker logic
         self.process_message(body)
 
-        # Delete message after successful processing
         delete_message(
             self.sqs_client,
             self.sqs_url,
@@ -76,7 +80,12 @@ class BaseWorker:
 
         print("[INFO] Message processed and deleted")
 
-    #
+    def should_process(self, message_type):
+        """
+        Determines if this worker should process the message based on its type.
+        Override in child classes if needed.
+        """
+        return True  # By default, process all messages
 
     def process_message(self, message):
         """

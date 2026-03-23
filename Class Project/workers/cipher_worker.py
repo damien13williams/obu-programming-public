@@ -14,6 +14,9 @@ class CipherWorker(BaseWorker):
         # Load English words for scoring
         self.ENGLISH_WORDS = set(word.upper() for word in words.words())
 
+    def should_process(self, message_type):
+        return message_type == "CIPHER"
+
     # Cipher logic
     def caesar_decrypt(self, text, shift):
         decrypted = []
