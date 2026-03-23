@@ -1,0 +1,40 @@
+{
+  "tasks": [
+    {
+      "name": "create_dynamo_db_table",
+      "table": "",
+      "partition_key": "item_id"
+    },
+    {
+      "name": "populate_dynamo_db_table",
+      "table": "",
+      "data_file": "data.json"
+    },
+    {
+      "name": "empty_dynamo_db_table",
+      "table": ""
+    },
+    {
+      "name": "delete_dynamo_db_table",
+      "table": ""
+    },
+    {
+      "name": "create_s3_bucket",
+      "bucket": "",
+      "region": "us-east-1"
+    },
+    {
+      "name": "populate_s3_bucket",
+      "bucket": "",
+      "folder": "./s3_data"
+    },
+    {
+      "name": "empty_s3_bucket",
+      "bucket": ""
+    },
+    {
+      "name": "delete_s3_bucket",
+      "bucket": "damien-test-bucket-12345"
+    }
+  ]
+}
