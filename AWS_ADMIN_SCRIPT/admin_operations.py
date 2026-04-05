@@ -71,6 +71,9 @@ def create_s3_bucket(bucket_name, region="us-east-1"):
 
 def delete_s3_bucket(bucket_name):
     try:
+        # First, empty the bucket
+        empty_s3_bucket(bucket_name)
+        
         bucket = s3.Bucket(bucket_name)
         bucket.delete()
         print(f"Deleted S3 bucket: {bucket_name}")
