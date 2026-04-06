@@ -5,9 +5,6 @@ from pathlib import Path
 from workers.base_worker import BaseWorker
 from utils.dynamo_utils import get_dynamodb_table, put_item
 
-# Make bundled packages available in Lambda (/var/task is where Lambda extracts the ZIP)
-sys.path.insert(0, "/var/task/packages")
-
 
 class CipherWorker(BaseWorker):
     """
@@ -26,10 +23,7 @@ class CipherWorker(BaseWorker):
     """
 
     def __init__(self, config_file_path):
-        """
-        config_file_path: path to JSON config file
-        """
-        # Pass the path to BaseWorker (BaseWorker expects a path, not a dict)
+        # Pass the path to BaseWorker
         super().__init__(config_file_path)
 
         # Load config JSON for internal use

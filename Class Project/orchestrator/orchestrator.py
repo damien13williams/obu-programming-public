@@ -47,7 +47,6 @@ class Orchestrator:
         print(f"[INFO] Orchestrator initialised: mode={self.mode}, tasks={len(self.tasks)}")
 
     # Dispatching 
-
     def _dispatch_task(self, task):
         """Post a single task message to SQS and record it in task_states."""
         item_id = task["item_id"]
@@ -95,7 +94,6 @@ class Orchestrator:
                 break
 
     # Monitoring 
-
     def _is_task_complete(self, task):
         """
         Check DynamoDB for a 'solution' field on the item.
@@ -111,8 +109,8 @@ class Orchestrator:
 
     def _wait_for_task(self, task):
         """
-        Poll DynamoDB every POLL_INTERVAL_SECONDS until the task is complete
-        or COMPLETION_TIMEOUT_SECONDS elapses.
+        Poll DynamoDB every poll_interval until the task is complete
+        or completion_timeout elapses.
         Returns True on success, False on timeout.
         """
         item_id = task["item_id"]
@@ -146,7 +144,6 @@ class Orchestrator:
             t.join()
 
     # Summary 
-
     def _print_summary(self):
         """Print a final status line for every task."""
         print("\n[INFO] ── Task Summary ──────────────────────────────")
@@ -157,7 +154,6 @@ class Orchestrator:
         print("[INFO] ─────────────────────────────────────────────\n")
 
     # Entry point 
-
     def run(self):
         """
         Main entry point:

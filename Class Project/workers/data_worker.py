@@ -9,8 +9,6 @@ import boto3
 from workers.base_worker import BaseWorker
 from utils.dynamo_utils import get_dynamodb_table
 
-# Make bundled packages available in Lambda (/var/task is where Lambda extracts the ZIP)
-sys.path.insert(0, "/var/task/packages")
 
 
 class DataWorker(BaseWorker):
@@ -147,6 +145,6 @@ if __name__ == "__main__":
     config_file = Path(__file__).parent.parent / "config" / "data_worker.json"
     worker = DataWorker(config_file)
     try:
-        worker.poll_sqs()  # Polls SQS continuously like CipherWorker
+        worker.poll_sqs() 
     except KeyboardInterrupt:
         print("\n[INFO] Data worker stopped.")
