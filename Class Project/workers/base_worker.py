@@ -57,27 +57,21 @@ class BaseWorker:
     # Handles the message for processing and deletes after
 
     def process_sqs_message(self, msg):
-        """
-        Wrapper that extracts the message body and deletes it after success.
-        """
         body = json.loads(msg["Body"])
-
         message_type = body.get("type")
 
         if not self.should_process(message_type):
             print(f"[INFO] Skipping message of type: {message_type}")
+            self.sqs_client.change_message_visibility(
+                QueueUrl=self.sqs_url,
+                ReceiptHandle=msg["ReceiptHandle"],
+                VisibilityTimeout=0 # so the worker does not hold on to the message if it is not its type
+            )
             return
 
         print(f"[INFO] Processing message: {body}")
-
         self.process_message(body)
-
-        delete_message(
-            self.sqs_client,
-            self.sqs_url,
-            msg["ReceiptHandle"]
-        )
-
+        delete_message(self.sqs_client, self.sqs_url, msg["ReceiptHandle"])
         print("[INFO] Message processed and deleted")
 
     def should_process(self, message_type):

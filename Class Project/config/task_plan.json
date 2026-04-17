@@ -2,14 +2,14 @@
   "mode": "parallel",
   "tasks": [
     {
-      "type": "CIPHER",
-      "table_name": "PuzzleTableDW",
-      "item_id": "item_1"
-    },
-    {
       "type": "DATA",
       "table_name": "PuzzleTableDW",
       "item_id": "item_6"
+    },
+    {
+      "type": "CIPHER",
+      "table_name": "PuzzleTableDW",
+      "item_id": "item_1"
     }
   ]
 }
