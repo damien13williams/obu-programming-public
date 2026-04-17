@@ -1,7 +1,0 @@
-{
-"puzzle_id": "cipher_001",
-"game_id": "game_12345",
-"cipher_type": "caesar",
-"encrypted_text": "fqef ftue",
-"hint": "shift_range: 1-25"
-}

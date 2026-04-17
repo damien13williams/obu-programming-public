@@ -1,9 +1,0 @@
-{
-  "aws": {
-    "region": "us-east-1",
-    "sqs_queue_url": "https://sqs.us-east-1.amazonaws.com/216990846240/damien_sqs_testing"
-  },
-  "orchestrator": {
-    "max_retries": 3
-  }
-}
