@@ -68,7 +68,7 @@ class ImageWorker(BaseWorker):
         return decoded[0].data.decode("utf-8")
 
     def extract_vault_code(self, text):
-        # Placeholder logic (same idea as your earlier version)
+        # Class decided no use for it so place holder like the other wokrers
         return "0000"
 
     # ---------------------------
@@ -110,7 +110,6 @@ class ImageWorker(BaseWorker):
                 "vault_code": vault_code
             },
 
-            "status": "completed",
             "processing_time_ms": processing_time
         }
 

@@ -78,6 +78,41 @@ def list_games():
     results.sort(key=lambda x: x["game_id"])
     return jsonify(convert_decimal(results)), 200
 
+@app.route("/games/<game_id>", methods=["GET"])
+def game_details(game_id):
+    response = table.scan()
+    items = response.get("Items", [])
+
+    while "LastEvaluatedKey" in response:
+        response = table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
+        items.extend(response.get("Items", []))
+
+    puzzles = [item for item in items if item.get("game_id") == game_id]
+
+    if not puzzles:
+        return jsonify({"error": "Game not found"}), 404
+
+    details = {
+        "game_id": game_id,
+        "status": get_game_status(puzzles),
+        "total_puzzles": len(puzzles),
+        "completed_puzzles": sum(
+            1 for p in puzzles if p.get("solution") is not None and p.get("solution") != {}
+        ),
+        "puzzles": []
+    }
+
+    for p in puzzles:
+        details["puzzles"].append({
+            "item_id": p.get("item_id"),
+            "puzzle_id": p.get("puzzle_id"),
+            "type": p.get("type") or p.get("puzzle_type") or p.get("cipher_type"),
+            "processing_time_ms": p.get("processing_time_ms"),
+            "solution_present": p.get("solution") is not None and p.get("solution") != {},
+            "solution": p.get("solution", {})
+        })
+
+    return jsonify(convert_decimal(details)), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000, debug=True)
