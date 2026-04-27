@@ -118,6 +118,36 @@ class ImageWorker(BaseWorker):
 
         print(f"[INFO] Solved {item_id}: {extracted_text}")
 
+# Lambda handler
+_lambda_worker = None
+
+def handler(event, context=None):
+    """
+    Lambda handler for SQS-triggered execution.
+    """
+    global _lambda_worker
+
+    if _lambda_worker is None:
+        config_file = Path(__file__).parent.parent / "config" / "image_worker.json"
+        _lambda_worker = ImageWorker(config_file)
+
+    processed_count = 0
+
+    for record in event.get("Records", []):
+        try:
+            message_body = json.loads(record["body"])
+        except json.JSONDecodeError:
+            print(f"[ERROR] Invalid JSON in message: {record.get('body')}")
+            continue
+
+        if _lambda_worker.should_process(message_body.get("type", "")):
+            _lambda_worker.process_message(message_body)
+            processed_count += 1
+        else:
+            print(f"[INFO] Skipping message of type: {message_body.get('type')}")
+
+    return {"processed_messages": processed_count}
+
 if __name__ == "__main__":
     config_file = Path(__file__).parent.parent / "config" / "image_worker.json"
     worker = ImageWorker(config_file)
