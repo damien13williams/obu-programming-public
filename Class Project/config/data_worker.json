@@ -1,12 +1,12 @@
 {
   "aws": {
     "region": "us-east-1",
-    "sqs_queue_url": "https://sqs.us-east-1.amazonaws.com/216990846240/DamienProjectQueue",
+    "sqs_queue_url": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-data-sqs",
     "dynamo_table": "PuzzleTableDW"
   },
   "worker": {
     "max_retries": 7,
-    "sqs_wait_time": 20,
+    "sqs_wait_time": 3,
     "visibility_timeout": 180,
     "max_sqs_messages": 5
   }

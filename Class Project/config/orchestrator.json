@@ -1,7 +1,13 @@
 {
   "aws": {
     "region": "us-east-1",
-    "sqs_queue_url": "https://sqs.us-east-1.amazonaws.com/216990846240/DamienProjectQueue"
+    "worker_queue_urls": {
+      "CIPHER": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-cipher-sqs",
+      "DATA": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-data-sqs",
+      "IMAGE": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-image-sqs",
+      "API": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-api-sqs",
+      "LOGIC": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-logic-sqs"
+    }
   },
   "orchestrator": {
     "poll_interval_seconds": 5,
