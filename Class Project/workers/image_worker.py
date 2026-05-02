@@ -48,15 +48,11 @@ class ImageWorker(BaseWorker):
         self.sqs_wait_time = self.config["worker"]["sqs_wait_time"]
         self.max_retries = self.config["worker"]["max_retries"]
 
-    # ---------------------------
     # Message routing
-    # ---------------------------
     def should_process(self, message_type):
         return message_type == "IMAGE"
 
-    # ---------------------------
     # Image logic
-    # ---------------------------
     def download_image(self, bucket, key):
         obj = self.s3.get_object(Bucket=bucket, Key=key)
         return Image.open(io.BytesIO(obj["Body"].read())).convert("RGB")
@@ -71,9 +67,7 @@ class ImageWorker(BaseWorker):
         # Class decided no use for it so place holder like the other wokrers
         return "0000"
 
-    # ---------------------------
     # Core processing
-    # ---------------------------
     def process_message(self, message):
         start_time = time.time()
 
