@@ -48,15 +48,11 @@ class ImageWorker(BaseWorker):
         self.sqs_wait_time = self.config["worker"]["sqs_wait_time"]
         self.max_retries = self.config["worker"]["max_retries"]
 
-    # ---------------------------
     # Message routing
-    # ---------------------------
     def should_process(self, message_type):
         return message_type == "IMAGE"
 
-    # ---------------------------
     # Image logic
-    # ---------------------------
     def download_image(self, bucket, key):
         obj = self.s3.get_object(Bucket=bucket, Key=key)
         return Image.open(io.BytesIO(obj["Body"].read())).convert("RGB")
@@ -68,12 +64,10 @@ class ImageWorker(BaseWorker):
         return decoded[0].data.decode("utf-8")
 
     def extract_vault_code(self, text):
-        # Placeholder logic (same idea as your earlier version)
+        # Class decided no use for it so place holder like the other wokrers
         return "0000"
 
-    # ---------------------------
     # Core processing
-    # ---------------------------
     def process_message(self, message):
         start_time = time.time()
 
@@ -110,7 +104,6 @@ class ImageWorker(BaseWorker):
                 "vault_code": vault_code
             },
 
-            "status": "completed",
             "processing_time_ms": processing_time
         }
 
