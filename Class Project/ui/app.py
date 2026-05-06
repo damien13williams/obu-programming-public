@@ -55,8 +55,8 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 
-@app.route("/help", methods=["GET"])
 @app.route("/", methods=["GET"])
+@app.route("/help", methods=["GET"])
 def help_page():
     readme_path = Path(__file__).parent / "README.md"
 
@@ -77,15 +77,11 @@ def help_page():
                     margin: 40px auto;
                     line-height: 1.6;
                     padding: 20px;
+                    white-space: pre-wrap;
                 }}
                 pre {{
-                    background: #f4f4f4;
-                    padding: 12px;
-                    overflow-x: auto;
-                }}
-                code {{
-                    background: #f4f4f4;
-                    padding: 2px 4px;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
                 }}
             </style>
         </head>

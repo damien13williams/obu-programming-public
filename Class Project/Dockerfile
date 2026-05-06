@@ -1,11 +1,12 @@
 FROM python:3.11-slim
-RUN mkdir -p /ui
-WORKDIR /ui
 
-COPY /ui . 
-COPY /config /ui/config
+WORKDIR /app
+
+COPY ui/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 EXPOSE 3000
 
-CMD ["python", "app.py"]
+CMD ["python", "ui/app.py"]
