@@ -54,7 +54,9 @@ def get_game_status(puzzles):
 def health():
     return jsonify({"status": "ok"}), 200
 
+
 @app.route("/help", methods=["GET"])
+@app.route("/", methods=["GET"])
 def help_page():
     readme_path = Path(__file__).parent / "README.md"
 
