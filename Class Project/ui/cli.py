@@ -1,7 +1,7 @@
-import boto3
-from collections import defaultdict
 import json
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 
 CONFIG_PATH = Path(__file__).parent.parent / "config" / "ui.json"
@@ -9,11 +9,7 @@ CONFIG_PATH = Path(__file__).parent.parent / "config" / "ui.json"
 with open(CONFIG_PATH) as f:
     config = json.load(f)
 
-REGION = config["aws"]["region"]
-TABLE_NAME = config["aws"]["dynamo_table"]
-
-dynamodb = boto3.resource("dynamodb", region_name=REGION)
-table = dynamodb.Table(TABLE_NAME)
+BASE_URL = config["service"]["base_url"].rstrip("/")
 
 
 def line(width=72, char="-"):
@@ -35,44 +31,25 @@ def status_label(status):
     return labels.get(status, status.upper())
 
 
-def get_all_items():
-    response = table.scan()
-    items = response.get("Items", [])
-
-    while "LastEvaluatedKey" in response:
-        response = table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
-        items.extend(response.get("Items", []))
-
-    return items
-
-
-def get_game_status(puzzles):
-    total = len(puzzles)
-    completed = sum(1 for p in puzzles if p.get("solution") not in (None, {}))
-
-    if completed == 0:
-        return "not_started"
-    if completed < total:
-        return "in_progress"
-    return "complete"
-
-
-def grouped_games():
-    items = get_all_items()
-    games = defaultdict(list)
-
-    for item in items:
-        game_id = item.get("game_id")
-        if game_id:
-            games[game_id].append(item)
-
-    return dict(sorted(games.items()))
+def fetch_json(path):
+    url = f"{BASE_URL}{path}"
+    with urlopen(url) as response:
+        return json.loads(response.read().decode("utf-8"))
 
 
 def list_games():
-    games = grouped_games()
-
     header("GAME LIST")
+
+    try:
+        games = fetch_json("/games")
+    except HTTPError as e:
+        print(f"Request failed: HTTP {e.code}")
+        print("Make sure the UI web service is running.")
+        return
+    except URLError:
+        print("Could not connect to the UI web service.")
+        print(f"Check that it is running at {BASE_URL}.")
+        return
 
     if not games:
         print("No games found.")
@@ -81,11 +58,12 @@ def list_games():
     print(f"{'GAME ID':<20} {'STATUS':<15} {'PUZZLES':>8} {'DONE':>8}")
     line()
 
-    for game_id, puzzles in games.items():
-        status = get_game_status(puzzles)
-        completed = sum(1 for p in puzzles if p.get("solution") not in (None, {}))
+    for game in games:
         print(
-            f"{game_id:<20} {status_label(status):<15} {len(puzzles):>8} {completed:>8}"
+            f"{game.get('game_id', 'N/A'):<20} "
+            f"{status_label(game.get('status', 'unknown')):<15} "
+            f"{game.get('total_puzzles', 0):>8} "
+            f"{game.get('completed_puzzles', 0):>8}"
         )
 
     line()
@@ -118,22 +96,32 @@ def format_value(value, indent=0):
 
 
 def show_game(game_id):
-    games = grouped_games()
-    puzzles = games.get(game_id)
-
     header("GAME DETAILS")
 
-    if not puzzles:
-        print(f"Game '{game_id}' not found.")
+    try:
+        details = fetch_json(f"/games/{game_id}")
+    except HTTPError as e:
+        if e.code == 404:
+            print(f"Game '{game_id}' not found.")
+            line()
+            return
+        print(f"Request failed: HTTP {e.code}")
+        line()
+        return
+    except URLError:
+        print("Could not connect to the UI web service.")
+        print(f"Check that it is running at {BASE_URL}.")
         line()
         return
 
-    status = get_game_status(puzzles)
-    completed = sum(1 for p in puzzles if p.get("solution") not in (None, {}))
+    puzzles = details.get("puzzles", [])
 
-    print(f"Game ID   : {game_id}")
-    print(f"Status    : {status_label(status)}")
-    print(f"Progress  : {completed}/{len(puzzles)} puzzles complete")
+    print(f"Game ID   : {details.get('game_id', game_id)}")
+    print(f"Status    : {status_label(details.get('status', 'unknown'))}")
+    print(
+        f"Progress  : {details.get('completed_puzzles', 0)}/"
+        f"{details.get('total_puzzles', len(puzzles))} puzzles complete"
+    )
     line()
 
     for index, puzzle in enumerate(puzzles, start=1):

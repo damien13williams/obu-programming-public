@@ -1,12 +1,21 @@
-from flask import Flask, jsonify
+import json
+import os
+from pathlib import Path
+
+from flask import Flask, jsonify, Response
 import boto3
 from collections import defaultdict
 from decimal import Decimal
 
 app = Flask(__name__)
 
-REGION = "us-east-1"
-TABLE_NAME = "PuzzleTableDW"
+CONFIG_PATH = Path(__file__).parent.parent / "config" / "ui.json"
+
+with open(CONFIG_PATH) as f:
+    config = json.load(f)
+
+REGION = os.getenv("AWS_REGION", config["aws"]["region"])
+TABLE_NAME = os.getenv("TABLE_NAME", config["aws"]["dynamo_table"])
 
 dynamodb = boto3.resource("dynamodb", region_name=REGION)
 table = dynamodb.Table(TABLE_NAME)
@@ -44,6 +53,47 @@ def get_game_status(puzzles):
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"}), 200
+
+@app.route("/help", methods=["GET"])
+def help_page():
+    readme_path = Path(__file__).parent / "README.md"
+
+    if not readme_path.exists():
+        return jsonify({"error": "README.md not found"}), 404
+
+    with open(readme_path, "r", encoding="utf-8") as f:
+        readme_content = f.read()
+
+    html = f"""
+    <html>
+        <head>
+            <title>Puzzle Project Help</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    max-width: 900px;
+                    margin: 40px auto;
+                    line-height: 1.6;
+                    padding: 20px;
+                }}
+                pre {{
+                    background: #f4f4f4;
+                    padding: 12px;
+                    overflow-x: auto;
+                }}
+                code {{
+                    background: #f4f4f4;
+                    padding: 2px 4px;
+                }}
+            </style>
+        </head>
+        <body>
+            <pre>{readme_content}</pre>
+        </body>
+    </html>
+    """
+
+    return Response(html, mimetype="text/html")
 
 
 @app.route("/games", methods=["GET"])

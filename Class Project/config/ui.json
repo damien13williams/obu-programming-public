@@ -2,5 +2,8 @@
   "aws": {
     "region": "us-east-1",
     "dynamo_table": "PuzzleTableDW"
+  },
+  "service": {
+    "base_url": "https://ze3msmmc6c.us-east-1.awsapprunner.com"
   }
 }
