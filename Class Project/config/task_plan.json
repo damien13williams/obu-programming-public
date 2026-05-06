@@ -1,30 +1,11 @@
 {
-  "mode": "parallel",
+  "mode": "sequential",
   "tasks": [
     {
-      "type": "CIPHER",
-      "table_name": "PuzzleTableDW",
-      "item_id": "item_1"
-    },
-    {
       "type": "DATA",
-      "table_name": "PuzzleTableDW",
-      "item_id": "item_6"
-    },
-    {
-      "type": "IMAGE",
-      "table_name": "PuzzleTableDW",
-      "item_id": "item_7"
-    },
-    {
-      "type": "API",
-      "table_name": "PuzzleTableDW",
-      "item_id": "item_8"
-    },
-    {
-      "type": "LOGIC",
-      "table_name": "PuzzleTableDW",
-      "item_id": "item_10"
+      "table_name": "AD_ProjectTable",
+      "puzzle_id": "data_002",
+      "game_id": "game_002"
     }
   ]
 }

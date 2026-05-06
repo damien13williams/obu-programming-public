@@ -1,3 +1,5 @@
+# Escape Room Puzzle Project
+
 # Puzzle Project
 ### Escape Room Puzzle 
 
@@ -318,3 +320,138 @@ All workers read their AWS settings from a JSON config file in `config/`. Each f
   }
 }
 ```
+
+Distributed puzzle-solving system using:
+- AWS SQS
+- DynamoDB
+- S3
+- Lambda
+- Flask
+- Docker
+- AWS App Runner
+
+The system contains:
+- Orchestrator
+- Multiple workers
+- Web service
+- Command-line interface
+
+---
+
+# Web Service Routes
+
+## Health Check
+
+GET /health
+
+Returns:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+## Help Page
+
+GET /
+GET /help
+
+Displays the project help information.
+
+---
+
+# JSON API Routes
+
+## GET /games
+
+Returns all games and statuses in JSON format.
+
+## GET /games/<game_id>
+
+Returns detailed information for a specific game in JSON format.
+
+---
+
+# HTML Routes
+
+## GET /get-games-in-html
+
+Returns all games and statuses in HTML format.
+
+## GET /get-game-details-in-html/<game_id>
+
+Returns detailed information for a specific game in HTML format.
+
+---
+
+# Text Routes
+
+## GET /get-games-in-text
+
+Returns all games and statuses in plain text format.
+
+Used by the command-line interface.
+
+## GET /get-game-details-in-text/<game_id>
+
+Returns detailed information for a specific game in plain text format.
+
+Used by the command-line interface.
+
+---
+
+# Command-Line Interface
+
+Run:
+
+```bash
+python ui/cli.py
+```
+
+The CLI will prompt for an App Runner URL.
+
+Menu options:
+1. List games
+2. Show game details
+3. Exit
+
+---
+
+# Workers
+
+Supported worker types:
+- Cipher
+- Data
+- Image
+- Logic
+- API Aggregator
+
+Workers consume SQS messages and update DynamoDB solutions.
+
+---
+
+# Docker
+
+Build:
+
+```bash
+docker buildx build --platform linux/amd64 -t cis-3823-final .
+```
+
+Run locally:
+
+```bash
+docker run -p 3000:3000 cis-3823-final
+```
+
+---
+
+# AWS Deployment
+
+The UI web service is deployed using:
+- Docker
+- Amazon ECR
+- AWS App Runner

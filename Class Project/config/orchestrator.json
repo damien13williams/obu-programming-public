@@ -3,7 +3,7 @@
     "region": "us-east-1",
     "worker_queue_urls": {
       "CIPHER": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-cipher-sqs",
-      "DATA": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-data-sqs",
+      "DATA": "https://sqs.us-east-1.amazonaws.com/216990846240/ad-data",
       "IMAGE": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-image-sqs",
       "API": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-api-sqs",
       "LOGIC": "https://sqs.us-east-1.amazonaws.com/216990846240/damien-logic-sqs"

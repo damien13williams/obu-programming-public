@@ -1,3 +1,4 @@
+from email.mime import message
 import json
 import time
 import threading
@@ -59,10 +60,18 @@ class Orchestrator:
 
         message = {
             "type": task_type,
-            "table_name": task["table_name"],
-            "item_id": item_id
+            "table_name": task["table_name"]
         }
 
+        if "item_id" in task:
+            message["item_id"] = task["item_id"]
+
+        if "puzzle_id" in task:
+            message["puzzle_id"] = task["puzzle_id"]
+
+        if "game_id" in task:
+            message["game_id"] = task["game_id"]
+            
         send_message(self.sqs_client, queue_url, message)
 
         self.task_states[item_id] = {"task": task, "status": "dispatched"}
